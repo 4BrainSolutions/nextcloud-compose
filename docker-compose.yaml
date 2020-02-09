@@ -1,0 +1,75 @@
+version: '2'
+
+services:
+  nextcloud:
+    depends_on:
+      - postgresql
+    image: nextcloud:latest
+    networks:
+      - nextcloudnet
+    volumes:
+      - nextcloud_html:/var/www/html
+      - nextcloud_apps:/var/www/html/custom_apps
+      - nextcloud_config:/var/www/html/config
+      - nextcloud_data:/var/www/data
+      - nextcloud_theme:/var/www/themes
+    ports:
+      - '8080:80'
+    environment:
+      - # CHANGE THE USER!
+      - 'NEXTCLOUD_ADMIN_USER=admin'
+      - # CHANGE THE PASSWORD!
+      - 'NEXTCLOUD_ADMIN_PASSWORD=nimda'
+        #DB_Config
+      - 'POSTGRES_DB=nextclouddb'
+      - 'POSTGRES_USER=nextclouduser'
+      - 'POSTGRES_HOST=postgresql'
+        # CHANGE THE PASSWORD!
+      - 'POSTGRES_PASSWORD=jellyfish'
+    restart: always
+    logging:
+      # limit logs retained on host to 25MB
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "50"
+
+  postgresql:
+    image: postgres:latest
+    networks:
+      - nextcloudnet
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    environment:
+      - 'POSTGRES_USER=nextclouduser'
+      # CHANGE THE PASSWORD!
+      - 'POSTGRES_PASSWORD=jellyfish'
+      - 'POSTGRES_DB=nextclouddb'
+      - 'POSTGRES_ENCODING=UNICODE'
+      - 'POSTGRES_COLLATE=C'
+      - 'POSTGRES_COLLATE_TYPE=C'
+    restart: always
+    logging:
+      # limit logs retained on host to 25MB
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "50"
+
+volumes:
+  nextcloud_html:
+    external: false
+  nextcloud_apps:
+    external: false
+  nextcloud_config:
+    external: false
+  nextcloud_data:
+    external: false
+  nextcloud_theme:
+    external: false
+  postgresql_data:
+    external: false
+
+networks:
+  nextcloudnet:
+    driver: bridge
