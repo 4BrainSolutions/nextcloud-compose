@@ -7,6 +7,7 @@ services:
     image: nextcloud:latest
     networks:
       - nextcloudnet
+      - bridge
     volumes:
       - nextcloud_html:/var/www/html
       - nextcloud_apps:/var/www/html/custom_apps
@@ -27,6 +28,7 @@ services:
         # CHANGE THE PASSWORD!
       - 'POSTGRES_PASSWORD=jellyfish'
     restart: always
+    command: "bash -c "
     logging:
       # limit logs retained on host to 25MB
       driver: "json-file"
@@ -71,5 +73,5 @@ volumes:
     external: false
 
 networks:
-  nextcloudnet:
-    driver: bridge
+  bridge:
+    external: true
